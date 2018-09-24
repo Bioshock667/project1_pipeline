@@ -1,0 +1,18 @@
+
+<div class='jumbotron'>
+<h1 class='display-4'>Login Menu</h1>
+<div class='input-group my-3'>
+  <div class='input-group-prepend'>
+    <span class='input-group-text' id='inputGroup-sizing-default'>UserName</span>
+  </div>
+  <input type='text' class='form-control' ng-model='username' aria-label='Default' aria-describedby='inputGroup-sizing-default'>
+</div>
+<div class='input-group my-3'>
+  <div class='input-group-prepend'>
+    <span class='input-group-text' id='inputGroup-sizing-default'>Password</span>
+  </div>
+  <input type='password' class='form-control' ng-model='password' aria-label='Default' aria-describedby='inputGroup-sizing-default'>
+</div>
+<button type='button' class='btn btn-primary' ng-click='validate()'>Login</button>
+</div>
+<p>{{login_message}}</p>

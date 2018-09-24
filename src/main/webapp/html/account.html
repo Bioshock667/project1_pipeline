@@ -1,0 +1,37 @@
+<div class="jumbotron">
+	<h1 class="display-4">Update Account</h1>
+	<form>
+		<div class="input-group my-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">First Name</span>
+			</div>
+			<input class="form-control" type="text" ng-model="first_name" value="{{user.first_name}}">
+		</div>
+		<div class="input-group my-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">Last Name</span>
+			</div>
+			<input class="form-control" type="text" ng-model="last_name" value="{{user.last_name}}">
+		</div>
+		<div class="input-group my-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">User Name</span>
+			</div>
+			<input class="form-control" type="text" ng-model="user_name" value="{{user.user_name}}">
+		</div>
+		<div class="input-group my-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">Password</span>
+			</div>
+			<input class="form-control" type="password" ng-model="password1">
+		</div>
+		<div class="input-group my-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text">Password</span>
+			</div>
+			<input class="form-control" type="password" ng-model="password2">
+		</div>
+		
+			<button class="btn" ng-click="submitAccChange()">Submit</button>
+	</form>
+</div>

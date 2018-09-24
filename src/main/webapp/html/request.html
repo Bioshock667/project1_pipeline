@@ -1,0 +1,28 @@
+<p>Welcome to the request page!</p>
+
+
+<div class='jumbotron'>
+<h1 class='display-4'>My Requests</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Reason</th>
+			<th>Date Submitted</th>
+			<th>Date Resolved</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="req in Requests">
+			<td>{{req.amount | currency}}</td>
+			<td>{{req.status}}</td>
+			<td>{{req.reason}}</td>
+			<td>{{req.dateSub}}</td>
+			<td>{{req.dateRes}}</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<a class="btn btn-primary btn-lg" href="#!/submitRequest" role="button">Submit Request</a>
+<button class="btn btn-secondary btn-lg">See All Requests</button>

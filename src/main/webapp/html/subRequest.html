@@ -1,0 +1,20 @@
+<div class="jumbotron">
+<h1 class="display-4">Submit New Request</h1>
+<form>
+	<div class="input-group mb-3">
+	  <div class="input-group-prepend">
+	    <span class="input-group-text">$</span>
+	  </div>
+	  <input type="number" class="form-control" aria-label="Amount" ng-model="amount" required>
+	</div>
+	<p>{{amount.$valid}}</p>
+	<div class="input-group">
+	  <div class="input-group-prepend">
+	    <span class="input-group-text">Reason</span>
+	  </div>
+	  <textarea class="form-control" aria-label="With textarea" ng-model="reason"></textarea>
+	</div>
+	
+	<button class="btn" ng-click="submitRequest()">Submit</button>
+</form>
+</div>

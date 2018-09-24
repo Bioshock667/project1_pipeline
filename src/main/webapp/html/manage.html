@@ -1,0 +1,72 @@
+<p>Welcome to the Manager Dashboard page!</p>
+
+<div class='jumbotron'>
+<h1 class='display-4'>Pending Requests</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Amount</th>
+			<th>Reason</th>
+			<th>Date Submitted</th>
+			
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="req in pRequests">
+			<td>{{req.amount | currency}}</td>
+			<td>{{req.reason}}</td>
+			<td>{{req.dateSub}}</td>
+			<td><button class="btn btn-success" ng-click="approve(req.id)">Approve</button></td>
+			<td><button class="btn btn-danger" ng-click="deny(req.id)">Deny</button></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<div class='jumbotron'>
+<h1 class='display-4'>Approved Requests</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Reason</th>
+			<th>Date Submitted</th>
+			<th>Date Resolved</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="req in aRequests">
+			<td>{{req.amount | currency}}</td>
+			<td>{{req.status}}</td>
+			<td>{{req.reason}}</td>
+			<td>{{req.dateSub}}</td>
+			<td>{{req.dateRes}}</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<div class='jumbotron'>
+<h1 class='display-4'>Rejected Requests</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Reason</th>
+			<th>Date Submitted</th>
+			<th>Date Resolved</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="req in rRequests">
+			<td>{{req.amount | currency}}</td>
+			<td>{{req.status}}</td>
+			<td>{{req.reason}}</td>
+			<td>{{req.dateSub}}</td>
+			<td>{{req.dateRes}}</td>
+		</tr>
+	</tbody>
+</table>
+</div>
