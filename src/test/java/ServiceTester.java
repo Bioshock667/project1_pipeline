@@ -1,11 +1,10 @@
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.junit.Test;
-
 import junit.framework.Assert;
 import model.*;
 import service.MainService;
+
 public class ServiceTester{
 
 	public ServiceTester() {
