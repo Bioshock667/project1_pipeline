@@ -1,13 +1,9 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.Test;
-import junit.framework.TestCase;
+
+import junit.framework.Assert;
 import model.*;
 import service.MainService;
 public class ServiceTester{
@@ -19,13 +15,13 @@ public class ServiceTester{
 	public void getEmployee() {
 		try {
 			Employee emp = MainService.getEmployee(0);
-			assertEquals("seth", emp.getUserName());
-			assertEquals("Seth", emp.getFirstName());
-			assertEquals("Lemanek", emp.getLastName());
-			assertEquals(true , emp.isManager());
-			assertNull(emp.getPassword());
+			Assert.assertEquals("seth", emp.getUserName());
+			Assert.assertEquals("Seth", emp.getFirstName());
+			Assert.assertEquals("Lemanek", emp.getLastName());
+			Assert.assertEquals(true , emp.isManager());
+			Assert.assertNull(emp.getPassword());
 		} catch (SQLException e) {
-			fail("SQL Exception has been thrown at getEmployee(): " + e.getMessage());
+			Assert.fail("SQL Exception has been thrown at getEmployee(): " + e.getMessage());
 		}
 	}
 	
@@ -37,11 +33,11 @@ public class ServiceTester{
 			emp2.setFirstName("Sheldon");
 			emp2.setLastName("Plankton");
 			MainService.updateEmployee(emp2);
-			assertEquals("Sheldon", emp2.getFirstName());
-			assertEquals("Plankton", emp2.getLastName());
+			Assert.assertEquals("Sheldon", emp2.getFirstName());
+			Assert.assertEquals("Plankton", emp2.getLastName());
 			MainService.updateEmployee(emp1);
 		}catch (SQLException e) {
-			fail("SQL Exception has been thrown at updateEmployee(): " + e.getMessage());
+			Assert.fail("SQL Exception has been thrown at updateEmployee(): " + e.getMessage());
 		}
 	}
 	
@@ -59,9 +55,9 @@ public class ServiceTester{
 			emp.setPassword(newPassword);
 			MainService.updateEmployee(emp);
 			Employee emp1 = MainService.login(emp.getUserName(), newPassword);
-			assertNotNull(emp1);
+			Assert.assertNotNull(emp1);
 		} catch (SQLException e) {
-			fail("SQL Exception has been thrown at updatePasswordAndTestLogin(): " + e.getMessage());
+			Assert.fail("SQL Exception has been thrown at updatePasswordAndTestLogin(): " + e.getMessage());
 		}
 	}
 	
@@ -76,9 +72,9 @@ public class ServiceTester{
 					return;
 				}
 			}
-			fail("Newly added request not found");
+			Assert.fail("Newly added request not found");
 		} catch (SQLException e) {
-			fail("SQL Exception has been thrown at submitAndGetRequest(): " + e.getMessage());
+			Assert.fail("SQL Exception has been thrown at submitAndGetRequest(): " + e.getMessage());
 		}
 	}
 }
