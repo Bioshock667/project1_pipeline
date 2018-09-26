@@ -46,5 +46,30 @@
   </dependencies>
   <build>
     <finalName>Project1</finalName>
+	<plugins>
+	<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-install-plugin</artifactId>
+    <version>3.5.2</version>
+    <executions>
+        <execution>
+            <id>install-oracle-jdbc</id>
+            <goals>
+                <goal>install-file</goal>
+            </goals>
+            <phase>clean</phase>
+            <configuration>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc7</artifactId>
+                <version>12.1.0</version>
+                <packaging>jar</packaging>
+                <generatePom>true</generatePom>
+                <createChecksum>true</createChecksum>
+                <file>Project1-pipeline/src/lib/ojdbc6.jar</file>
+            </configuration>
+        </execution>
+    </executions>
+	</plugin>
+	</plugins>
   </build>
 </project>
