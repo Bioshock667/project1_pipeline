@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>	
+        <Property name="basePath">src/main/resources</Property>
+    </Properties>
+  <Appenders>
+    <Console name="Console">
+      <PatternLayout pattern="%d{MM,dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <RollingFile name="fileLogger" fileName="${basePath}/app-info.html"
+                     filePattern="${basePath}/app-info-%d{yyyy-MM-dd}.html">
+            <HTMLLayout charset="UTF-8" title="Info Logs" locationInfo="true" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+  	</RollingFile>
+  </Appenders>
+  
+  <Loggers>
+    <Root level="trace">
+      <AppenderRef ref="fileLogger"/>
+    </Root>
+  </Loggers>
+</Configuration>

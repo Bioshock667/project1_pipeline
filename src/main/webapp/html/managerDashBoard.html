@@ -1,1 +1,30 @@
 <h1>Welcome to the Manager DashBoard!</h1>
+
+<div class='jumbotron'>
+<h1 class='display-4'>Pending Requests</h1>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Submitter</th>
+			<th>Amount</th>
+			<th>Reason</th>
+			<th>Date Submitted</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="req in requests">
+			<td>{{req.subName}}</td>
+			<td>{{req.amount | currency}}</td>
+			<td>{{req.reason}}</td>
+			<td>{{req.dateSub}}</td>
+			<td>
+				<div class="row">
+					<button class="btn btn-success col-sm" ng-click="approve(req.id)">Approve</button>
+					<button class="btn btn-danger col-sm" ng-click="deny(req.id)">Deny</button>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>

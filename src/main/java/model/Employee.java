@@ -19,6 +19,31 @@ public class Employee {
 		this.lastName = lastName;
 		this.isManager = isManager;
 	}
+	/**
+	 * compares every property but password to determine equality
+	 * @param other
+	 * @return
+	 */
+	public boolean equals(Employee other) {
+		if(this.firstName == null || other.firstName == null)
+			return false;
+		if(this.lastName == null ||other.lastName == null)
+			return false;
+		if(this.userName == null || other.userName == null)
+			return false;
+		if(!this.firstName.equals(other.firstName))
+			return false;
+		if(!this.lastName.equals(other.lastName))
+			return false;
+		if(!this.userName.equals(other.userName))
+			return false;
+		return true;
+	}
+	@Override
+	public String toString() {
+		return "Employee [id=" + id + ", userName=" + userName + ", password=" + password + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", isManager=" + isManager + "]";
+	}
 	public void setId(int id) {
 		this.id = id;
 	}

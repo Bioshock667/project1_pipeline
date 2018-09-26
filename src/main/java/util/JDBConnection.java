@@ -19,10 +19,10 @@ public class JDBConnection {
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				Properties props = new Properties();
-				FileInputStream in = new FileInputStream("C:\\Users\\jaffa\\Documents\\workspace-sts-3.9.5.RELEASE\\Project1\\src\\main\\resources\\connections.properties");
-				File f = new File("src/main/resources/connections.properties");
-				System.out.println(f.exists());
-				System.out.println(f.getAbsolutePath());
+				FileInputStream in = new FileInputStream("src/main/resources/connections.properties");
+//				File f = new File("src/main/resources/connections.properties");
+//				System.out.println(f.exists());
+//				System.out.println(f.getAbsolutePath());
 				props.load(in);
 				String url = props.getProperty("url");
 				String username = props.getProperty("username");

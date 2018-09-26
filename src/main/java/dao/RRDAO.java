@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import model.ReimbRequest;
 import model.Status;
@@ -41,7 +40,13 @@ public class RRDAO implements DAO<ReimbRequest> {
 
 	public ReimbRequest get(int id) throws SQLException {
 		Connection conn = JDBConnection.getConnection();
-		String sql = "select * from r_requests where rr_id = ?";
+		String sql = "    select sub_query.*, employees.first_name || ' ' || employees.last_name as submitter_name from" + 
+				"    ( select r.*," + 
+				"        (case when e.first_name is null and e.last_name is null " +
+				" 			then null  else  e.first_name || ' ' || e.last_name end)  as resolver_name" + 
+				"        from r_requests r left join employees e on r.resolver_id=e.emp_id where r.rr_id = ?" + 
+				"    ) sub_query" + 
+				"    join employees on sub_query.emp_id=employees.emp_id;";
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setInt(1, id);
 		ResultSet result = ps.executeQuery();
@@ -52,9 +57,11 @@ public class RRDAO implements DAO<ReimbRequest> {
 			int resolver_id = result.getInt("resolver_id");
 			Timestamp date_submitted = result.getTimestamp("date_submitted");
 			Timestamp date_resolved = result.getTimestamp("date_resolved");
+			String submitterName = result.getString("submitter_name");
+			String resolverName = result.getString("resolver_name");
 			String reason = result.getString("reason");
 			String r_reason = result.getString("rejection_reason");
-			return new ReimbRequest(id,emp_id, amount, status, resolver_id, date_submitted, date_resolved, reason, r_reason);
+			return new ReimbRequest(id,emp_id, amount, status, submitterName, resolverName, date_submitted, date_resolved, reason, r_reason);
 		}
 		else
 			return null;
@@ -64,17 +71,19 @@ public class RRDAO implements DAO<ReimbRequest> {
 		// TODO Auto-generated method stub
 		
 	}
-	public void approve(int rr_id) throws SQLException {
+	public void approve(int rr_id, int resolverId) throws SQLException {
 		Connection conn = JDBConnection.getConnection();
-		CallableStatement cs = conn.prepareCall("{ call approve_request(?) }");
+		CallableStatement cs = conn.prepareCall("{ call approve_request(?,?) }");
 		cs.setInt(1, rr_id);
+		cs.setInt(2, resolverId);
 		cs.executeUpdate();
 	}
-	public void deny(int rr_id, String reason) throws SQLException {
+	public void deny(int rr_id, int resolverId, String reason) throws SQLException {
 		Connection conn = JDBConnection.getConnection();
-		CallableStatement cs = conn.prepareCall("{ call deny_request(?,?) }");
+		CallableStatement cs = conn.prepareCall("{ call deny_request(?,?,?) }");
 		cs.setInt(1, rr_id);
-		cs.setString(2, reason);
+		cs.setInt(2, resolverId);
+		cs.setString(3, reason);
 		cs.executeUpdate();
 	}
 	public void delete(int id) throws SQLException {
@@ -85,8 +94,6 @@ public class RRDAO implements DAO<ReimbRequest> {
 		ps.executeUpdate();
 	}
 	public ArrayList<ReimbRequest> getRRs(Integer id, String... args) throws SQLException {
-		System.out.println("num args" + args.length);
-		System.out.println(id);
 		if(args.length !=0 && args.length != 2 && args.length != 4 && args.length != 5)
 			throw new IllegalArgumentException("Illegal amount of arguments");
 		String[] columns = {"amount","date_resolved","date_submitted","emp_id","reason",
@@ -105,21 +112,29 @@ public class RRDAO implements DAO<ReimbRequest> {
 		}
 		ArrayList<ReimbRequest> RRs = new ArrayList<ReimbRequest>();
 		Connection conn = JDBConnection.getConnection();
-		StringBuilder sb = new StringBuilder("select * from r_requests");
+		
+		String s = "    select sub_query.*, employees.first_name || ' ' || employees.last_name as submitter_name from" + 
+				"    ( select r.*," + 
+				"        (case when e.first_name is null and e.last_name is null " +
+				" 			then null  else  e.first_name || ' ' || e.last_name end)  as resolver_name" + 
+				"        from r_requests r left join employees e on r.resolver_id=e.emp_id" + 
+				"    ) sub_query" + 
+				"    join employees on sub_query.emp_id=employees.emp_id";
+		
+		StringBuilder sb = new StringBuilder(s);
 		if(id != null || args.length >=2) {
 			sb.append(" where ");
 			if(id != null && args.length >= 2) {
-				sb.append("emp_id = ? and " + args[0] + " = ?");
+				sb.append("sub_query.emp_id = ? and sub_query" + args[0] + " = ?");
 			} else {
 				if(id != null)
-					sb.append("emp_id = ?");
+					sb.append("sub_query.emp_id = ?");
 				else if (args.length >= 2) {
 					sb.append(args[0] + " = ?");
 				}
 			}
 		}
 		String sql = sb.toString();
-		System.out.println(sql);
 		
 		PreparedStatement ps = conn.prepareStatement(sql);
 		if(id != null) {
@@ -139,10 +154,12 @@ public class RRDAO implements DAO<ReimbRequest> {
 			int resolver_id = result.getInt("resolver_id");
 			Timestamp date_submitted = result.getTimestamp("date_submitted");
 			Timestamp date_resolved = result.getTimestamp("date_resolved");
+			String submitterName = result.getString("submitter_name");
+			String resolverName = result.getString("resolver_name");
 			String reason = result.getString("reason");
 			String r_reason = result.getString("rejection_reason");
-			RRs.add( new ReimbRequest(rr_id, emp_id, amount, status, resolver_id,
-					date_submitted, date_resolved, reason, r_reason));
+			RRs.add( new ReimbRequest(rr_id, emp_id, amount, status, submitterName,
+					resolverName, date_submitted, date_resolved, reason, r_reason));
 		}
 		return RRs;
 	}

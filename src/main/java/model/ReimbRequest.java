@@ -7,20 +7,22 @@ public class ReimbRequest {
 	private int empID;
 	private double amount;
 	private Status status;
-	private int resolver_id;
+	private String submitterName;
+	private String resolverName;
 	private Timestamp dateSubmitted;
 	private Timestamp dateResolved;
 	private String reason;
 	private String reject_reason;
 
-	public ReimbRequest(int id, int empID, double amount, Status status, int resolver_id, Timestamp dateSubmitted,
+	public ReimbRequest(int id, int empID, double amount, Status status, String sName, String rName, Timestamp dateSubmitted,
 			Timestamp dateResolved, String reason, String reject_reason) {
 		super();
 		this.id = id;
 		this.empID = empID;
 		this.amount = amount;
 		this.status = status;
-		this.resolver_id = resolver_id;
+		this.submitterName = sName;
+		this.resolverName = rName;
 		this.dateSubmitted = dateSubmitted;
 		this.dateResolved = dateResolved;
 		this.reason = reason;
@@ -38,8 +40,12 @@ public class ReimbRequest {
 	public String getReason() {
 		return reason;
 	}
-	public int getResolver_id() {
-		return resolver_id;
+	
+	public String getSubmitterName() {
+		return submitterName;
+	}
+	public String getResolverName() {
+		return resolverName;
 	}
 	public Status getStatus() {
 		return status;
