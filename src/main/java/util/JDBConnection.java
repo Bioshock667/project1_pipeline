@@ -8,21 +8,16 @@ import java.util.Properties;
 
 public class JDBConnection {
 
-	private static Connection conn;
-	/**
-	 * Returns a Singleton database connection
-	 * @return
-	 */
-	public static Connection getConnection() {
-	
-		if (conn == null) {
+	public JDBConnection() {
+		if(conn == null) {
 			try {
-				Class.forName("oracle.jdbc.driver.OracleDriver");
-				Properties props = new Properties();
-				FileInputStream in = new FileInputStream("src/main/resources/connections.properties");
-//				File f = new File("src/main/resources/connections.properties");
+				Class.forName("org.postgresql.Driver");
+				String fName = JDBConnection.class.getClassLoader().getResource("connections.properties").getFile();
+				System.out.println(fName);
 //				System.out.println(f.exists());
 //				System.out.println(f.getAbsolutePath());
+				Properties props = new Properties();
+				FileInputStream in = new FileInputStream(fName);
 				props.load(in);
 				String url = props.getProperty("url");
 				String username = props.getProperty("username");
@@ -33,6 +28,13 @@ public class JDBConnection {
 				e.printStackTrace();
 			} 
 		}
+	}
+	private static Connection conn;
+	/**
+	 * Returns a Singleton database connection
+	 * @return
+	 */
+	public Connection getConnection() {
 		return conn;
 	}
 }

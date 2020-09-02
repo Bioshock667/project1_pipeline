@@ -3,6 +3,7 @@
         <link rel='stylesheet' type='text/css' href='main.css'>
         <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css'
          integrity='sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO' crossorigin='anonymous'>
+         <link rel="icon" href="favicon.ico">
          <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
         <title>ERS</title>
     </head>
@@ -17,14 +18,14 @@
        			aria-controls='navbarTogglerDemo03' aria-expanded='false' aria-label='Toggle navigation' ng-if="type != 'login'">
               <span class='navbar-toggler-icon'></span>
             </button>
-            <a class='navbar-brand {{navItems[0]}}' href='#!/{{type}}'>BitMiner Corp. ERS App</a>
+            <a class='navbar-brand {{navItems[0]}}' href='#!/{{userInfo.type}}'>BitMiner Corp. ERS App</a>
           
-            <div class='collapse navbar-collapse' id='navbarToggler' ng-if="type != 'login'">
+            <div class='collapse navbar-collapse' id='navbarToggler' ng-if="userInfo">
               <ul class='navbar-nav mr-auto mt-2 mt-lg-0'>
                 <li class='nav-item {{navItems[1]}}'>
                   <a class='nav-link' href="#!/requests">My Requests</a>
                 </li>
-                <li class='nav-item {{navItems[2]}}' ng-if="type == 'manager'">
+                <li class='nav-item {{navItems[2]}}' ng-if="userInfo.type == 'manager'">
                   <a class='nav-link' href="#!/manage">Resolve Requests</a>
                 </li>
                 <li class='nav-item {{navItems[3]}}'>
@@ -36,15 +37,16 @@
               </ul>
             </div>
 		</nav>
-	    
-	    <p>Hello World</p>
-	    <p>How are you?</p>
-	    <p>Test 3</p>
-	    <p>Hey look another change</p>
     <div ng-view class='container-fluid'>
     </div>
-    <p>{{error}}</p>
-    <p ng-bind-html="error_message"></p>
+    
+<div class="alert alert-danger alert-dissmissible collapse" role="alert">
+  	<b>{{error}}:</b>  {{error_message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<p> hello </p>
     </body>
 
     <script src='https://code.jquery.com/jquery-3.3.1.slim.min.js'

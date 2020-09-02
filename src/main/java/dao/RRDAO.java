@@ -24,11 +24,14 @@ import util.JDBConnection;
     CONSTRAINT FK_RR_SUBMITTER_ID FOREIGN KEY (emp_id) REFERENCES employees(emp_id) ON DELETE CASCADE
     );
     */
-public class RRDAO implements DAO<ReimbRequest> {
+public class RRDAO extends DAO<ReimbRequest> {
+
+	public RRDAO(Connection conn) {
+		super(conn);
+	}
 
 	public void create(ReimbRequest entry) throws SQLException {
-		Connection conn = JDBConnection.getConnection();
-		String sql = "insert into r_requests values(rr_id_generator.nextval, ?, ?, ?, null, current_timestamp, null, ?, null)";
+		String sql = "insert into r_requests values(nextval('rr_id_generator'), ?, ?, ?, null, current_timestamp, null, ?, null)";
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setInt(1, entry.getEmpID());
 		ps.setDouble(2, entry.getAmount());
@@ -39,7 +42,6 @@ public class RRDAO implements DAO<ReimbRequest> {
 	}
 
 	public ReimbRequest get(int id) throws SQLException {
-		Connection conn = JDBConnection.getConnection();
 		String sql = "    select sub_query.*, employees.first_name || ' ' || employees.last_name as submitter_name from" + 
 				"    ( select r.*," + 
 				"        (case when e.first_name is null and e.last_name is null " +
@@ -53,6 +55,8 @@ public class RRDAO implements DAO<ReimbRequest> {
 		if(result.next()) {
 			int emp_id = result.getInt("emp_id");
 			double amount = result.getDouble("amount");
+			System.out.println("What is wrong with "+ result.getString("status"));
+			System.out.println(Status.PENDING.toString());
 			Status status = Status.valueOf(result.getString("status"));
 			int resolver_id = result.getInt("resolver_id");
 			Timestamp date_submitted = result.getTimestamp("date_submitted");
@@ -72,22 +76,19 @@ public class RRDAO implements DAO<ReimbRequest> {
 		
 	}
 	public void approve(int rr_id, int resolverId) throws SQLException {
-		Connection conn = JDBConnection.getConnection();
-		CallableStatement cs = conn.prepareCall("{ call approve_request(?,?) }");
+		CallableStatement cs = conn.prepareCall("call approve_request(?,?)");
 		cs.setInt(1, rr_id);
 		cs.setInt(2, resolverId);
 		cs.executeUpdate();
 	}
 	public void deny(int rr_id, int resolverId, String reason) throws SQLException {
-		Connection conn = JDBConnection.getConnection();
-		CallableStatement cs = conn.prepareCall("{ call deny_request(?,?,?) }");
+		CallableStatement cs = conn.prepareCall("call deny_request(?,?,?)");
 		cs.setInt(1, rr_id);
 		cs.setInt(2, resolverId);
 		cs.setString(3, reason);
 		cs.executeUpdate();
 	}
 	public void delete(int id) throws SQLException {
-		Connection conn = JDBConnection.getConnection();
 		String sql = "delete from r_requests where rr_id = ?";
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setInt(1, id);
@@ -111,7 +112,6 @@ public class RRDAO implements DAO<ReimbRequest> {
 				throw new IllegalArgumentException("Illegal amount of arguments");;
 		}
 		ArrayList<ReimbRequest> RRs = new ArrayList<ReimbRequest>();
-		Connection conn = JDBConnection.getConnection();
 		
 		String s = "    select sub_query.*, employees.first_name || ' ' || employees.last_name as submitter_name from" + 
 				"    ( select r.*," + 
@@ -150,7 +150,7 @@ public class RRDAO implements DAO<ReimbRequest> {
 			int rr_id = result.getInt("rr_id");
 			int emp_id = result.getInt("emp_id");
 			double amount = result.getDouble("amount");
-			Status status = Status.valueOf(result.getString("status"));
+			Status status = Status.valueOf(result.getString("status").trim());
 			int resolver_id = result.getInt("resolver_id");
 			Timestamp date_submitted = result.getTimestamp("date_submitted");
 			Timestamp date_resolved = result.getTimestamp("date_resolved");

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,17 +23,16 @@ import javax.xml.bind.DatatypeConverter;
 
 import model.Employee;
 import model.ReimbRequest;
-import oracle.sql.TIMESTAMP;
 import service.MainService;
 import util.JDBConnection;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+
 public class MainHelper {
-	private static final String HTMLDIR = "C:\\Users\\jaffa\\Documents\\workspace-sts-3.9.5.RELEASE\\Project1\\src\\main\\resources\\html\\";
 	public static boolean hasSession(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
-		return session != null && session.getAttribute("info") != null;
+		return session != null ;
 	}
 	public static void handleGetRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//System.out.println("incoming request  GET " + request.getRequestURI());
@@ -48,9 +46,6 @@ public class MainHelper {
 		}
 		try {
 			switch(request.getRequestURI()) {
-			case "/Project1/MainServlet/home":
-				response.getWriter().append("home");
-				break;
 			case "/Project1/MainServlet/getRequests":
 				getRequests(false, request, response);
 				break;
@@ -142,22 +137,13 @@ public class MainHelper {
 		
 			String name = jo.getString("username");
 			String password = jo.getString("password");
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] digest = md.digest(password.getBytes());
-			String myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
-			Employee user = MainService.login(name, myHash);
+			Employee user = MainService.login(name, password);
 			
 			if(user != null) {
 				HttpSession session = request.getSession();
 				session.setAttribute("info", user);
-				Cookie type;
-				if(user.isManager())
-					type = new Cookie("type", "manager");
-				else
-					type = new Cookie("type", "employee");
-				type.setPath("/Project1");
-				response.addCookie(type);
-				response.getWriter().append("success");
+				JSONObject userInfo = EtoJSON(user);
+				response.getWriter().append(userInfo.toString());
 			}
 			else {
 				response.getWriter().append("unsuccessful");
@@ -255,13 +241,6 @@ public class MainHelper {
 		String body = request.getReader().readLine();
 		JSONObject jo = new JSONObject(body);
 		Employee newCreds = JSONtoE(jo, user.isManager());
-		
-		if(newCreds.getPassword() != null) {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] digest = md.digest(newCreds.getPassword().getBytes());
-			String myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
-			newCreds.setPassword(myHash);
-		}
 		MainService.updateEmployee(newCreds);
 		if(newCreds.getPassword() != null) {
 			logout(request, response);
@@ -292,7 +271,7 @@ public class MainHelper {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.getWriter().append("unauthorized");
 	}
-		private static void sendServerError(HttpServletResponse response, String error_message) throws IOException {
+	private static void sendServerError(HttpServletResponse response, String error_message) throws IOException {
 		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		response.getWriter().append(error_message);
 	}
@@ -308,7 +287,7 @@ public class MainHelper {
 	}
 	private static JSONObject EtoJSON(Employee user) {
 		return new JSONObject().put("id", user.getId()).put("firstName", user.getFirstName()).put("lastName", user.getLastName())
-			.put("password", user.getPassword()).put("userName", user.getUserName());
+			.put("type",user.isManager()?"manager":"employee").put("userName", user.getUserName());
 	}
 
 	private static Employee JSONtoE(JSONObject jo, boolean isManager) {

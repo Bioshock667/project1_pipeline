@@ -25,9 +25,10 @@ app.config(function($routeProvider){
 });
 
 app.controller("MainCtrl", function($rootScope, $scope, $http, $location, $cookies, $sanitize) {
-
-	$rootScope.type = $cookies.get("type");
+	if(!$rootScope.userInfo)
+		$rootScope.userInfo = JSON.parse(localStorage.getItem("userInfo"));
 	$scope.logout = function() {
+		localStorage.clear();
 		$http.get("MainServlet/logout");
 		$location.path("/login");
 	}
@@ -43,7 +44,7 @@ app.controller("MainCtrl", function($rootScope, $scope, $http, $location, $cooki
 	
 	$rootScope.handleFailure = function(response) {
 		if(response == null) {
-			console.log("Null Failure REsponse");
+			console.log("Null Failure Response");
 			return;
 		}
 		if (response.status == 500) {
@@ -61,14 +62,18 @@ app.controller("MainCtrl", function($rootScope, $scope, $http, $location, $cooki
 	$rootScope.displayError = function(error_type, error_message) {
 		$rootScope.error = error_type;
 		$rootScope.error_message = $sanitize(error_message);
+		$(".alert-danger").show();
 	}
 
 	$http.get("MainServlet/isloggedin").then(function success(response){
 		if(response.data == "true") {
-			$location.path("/"+$rootScope.type);
+			console.log($rootScope.userInfo)
+			if($rootScope.userInfo)
+			$location.path("/"+$rootScope.userInfo.type);
+			else
+				$scope.logout();
 		}
 		else {
-			$cookies.remove("type");
 			$rootScope.type = "login";
 			$location.path("/login");
 		}
@@ -80,15 +85,13 @@ app.controller("MainCtrl", function($rootScope, $scope, $http, $location, $cooki
 
 app.controller("loginHandler", function($rootScope, $cookies, $scope, $http, $location) {
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-	$rootScope.type = "login"
     $scope.validate = function() {
     	var data1 = {username: $scope.username, password: $scope.password}
         $http.post('MainServlet/login', data1).then(function success(response) {
-			if(response.data == "success") {
-				$rootScope.type = $cookies.get("type");
-				console.log("cookie type=" + $rootScope.type);
-				console.log(document.cookie);
-				$location.path("/"+$rootScope.type);
+			if(response.data != "unsuccessful") {
+				$rootScope.userInfo = response.data;
+				localStorage.setItem("userInfo", JSON.stringify(response.data));
+				$location.path("/"+$rootScope.userInfo.type);
 			} else {
 				$scope.login_message = "login unsuccessful";
 			}
@@ -99,15 +102,37 @@ app.controller("loginHandler", function($rootScope, $cookies, $scope, $http, $lo
 });
 app.controller("employeeHandler", function($rootScope, $scope, $cookies) {
 	$rootScope.toggleNav(0);
-	
 });
 
 app.controller("managerHandler", function($rootScope, $scope, $http) {
 	$rootScope.toggleNav(0);
 	$scope.refresh = function() {
-		$http.get("MainServlet/getAllRequests?field=status&value=PENDING").then(function success(response) {
+		$http.get("MainServlet/getAllRequests").then(function success(response) {
 			$scope.requests = response.data;
-			console.log(response.data);
+			var total = response.data.length;
+			var approved = response.data.filter(r_req => r_req.status == "APPROVED").length;
+			var rejected = response.data.filter(r_req => r_req.status == "REJECTED").length;
+			var pending = response.data.filter(r_req => r_req.status == "PENDING").length;
+			if(pending > 0)
+				$('.alert').alert()
+			var percentages = {"Approved": approved / total, "Rejected":rejected/total,"Pending": pending/total};
+			$scope.piechartData = {};
+			var cummulativePercentage = 0;
+			for(var r_type in percentages){
+			var currentLocation = Math.cos(2*Math.PI*cummulativePercentage) + " "
+				+   Math.sin(2*Math.PI*cummulativePercentage);
+				cummulativePercentage += percentages[r_type];
+				$scope.piechartData[r_type] = "M 0 0" + // Move
+    			"L "+ currentLocation+ // Line
+    			"A 1 1 0 "+(percentages[r_type] > 0.5?1:0)+" 1 "+
+				 Math.cos(2*Math.PI*cummulativePercentage) + " "
+				+   Math.sin(2*Math.PI*cummulativePercentage);// Arc
+				$scope.piechartData[r_type]["end"] = currentLocation;
+				
+			}
+			$scope.approvedPathData = "M200 200 L 400 200 A 200 200 0 0 0 "
+				 +( 200+ (200 * Math.cos(2*Math.PI*approved/total))) + " "
+				+ ( 200+ (200 * Math.sin(2*Math.PI*approved/total)));
 		}, function failure(response){
 	    	$rootScope.handleFailure(response);
 		})
@@ -188,6 +213,7 @@ app.controller("accountHandler", function($rootScope, $scope, $http) {
 				console.log($scope.password1 + " = " + $scope.password2);
 			} else {
 				console.log($scope.password1 + " != " + $scope.password2);
+				$rootScope.displayError("Invalid Password", "The passwords must match");
 				return;
 			}
 		} else {

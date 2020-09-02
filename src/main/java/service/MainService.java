@@ -1,4 +1,6 @@
 package service;
+import java.io.File;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.*;
@@ -7,14 +9,17 @@ import java.util.ArrayList;
 import dao.EmployeeDAO;
 import dao.RRDAO;
 import model.*;
+import util.JDBConnection;
 public class MainService {
-	private static EmployeeDAO eDAO = new EmployeeDAO();
-	private static RRDAO rrDAO = new RRDAO();
+	private static JDBConnection connectionManager = new JDBConnection();
+	private static EmployeeDAO eDAO = new EmployeeDAO(connectionManager.getConnection());
+	private static RRDAO rrDAO = new RRDAO(connectionManager.getConnection());
 
 	final public static Logger logger;
 	
 	static {
-		System.setProperty("log4j.configurationFile","src/main/resources/configuration.xml");
+		System.out.println(new File("").getAbsolutePath());
+		System.setProperty("log4j.configurationFile",MainService.class.getClassLoader().getResource("configuration.xml").getFile());
 		logger = LogManager.getLogger(MainService.class);
 		System.out.println("Configuration File Defined To Be :: "+System.getProperty("log4j.configurationFile"));
 		System.setProperty("log4j2.debug", "true");
@@ -26,7 +31,7 @@ public class MainService {
 	public static void submitReq(int emp_id, double amount, String reason) throws SQLException {
 		rrDAO.create(new ReimbRequest(0,emp_id, amount, Status.PENDING, null, null, null, null, reason, null));
 	}
-	public static Employee login(String username, String password) throws SQLException {
+	public static Employee login(String username, String password) throws SQLException, NoSuchAlgorithmException {
 		logger.info("Validating user: " + username);
 		return eDAO.validate(username, password);
 	}
@@ -47,7 +52,7 @@ public class MainService {
 	public static ReimbRequest getRR(int id) throws SQLException {
 		return rrDAO.get(id);
 	}
-	public static void updateEmployee(Employee e) throws SQLException {
+	public static void updateEmployee(Employee e) throws SQLException, NoSuchAlgorithmException {
 		eDAO.update(e);
 	}
 
